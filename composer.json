@@ -14,8 +14,8 @@
     "require": {
         "php": ">=7.0",
         "nesbot/carbon": "^2.28",
-        "symfony/serializer": "^5.0",
-        "symfony/property-access": "^5.0",
+        "symfony/serializer": "^6.2",
+        "symfony/property-access": "^6.2",
         "league/flysystem": ">=1.0",
         "mpdf/mpdf": "^8.1"
     },
