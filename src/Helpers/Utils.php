@@ -10,7 +10,7 @@ class Utils
     {
         $date = \DateTime::createFromFormat($str_dateformat, $str_dt, new \DateTimeZone($str_timezone));
 
-        return $date && \DateTime::getLastErrors()['warning_count'] == 0 && \DateTime::getLastErrors()['error_count'] == 0;
+        return $date && (!\DateTime::getLastErrors() || (\DateTime::getLastErrors()['warning_count'] == 0 && \DateTime::getLastErrors()['error_count'] == 0));
     }
 
     public static function isValor($valor)
