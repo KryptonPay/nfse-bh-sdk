@@ -26,8 +26,8 @@ class ConsultBase
      */
     protected function callConsultation(Settings $settings, object $parameters): void
     {
-        switch ($parameters->file) {
 
+        switch ($parameters->file) {
             case 'consultaSituacaoLoteRps':
             case 'consultaLoteRps':
                 $this->xml = XML::load($parameters->file)
@@ -44,6 +44,15 @@ class ConsultBase
                     ->save();
                 break;
 
+            case 'consultaQuasarNFs':
+                $this->xml = XML::load($parameters->file)
+                    ->set('cnpj', $settings->issuer->cnpj)
+                    ->set('inscricaoMunicipal', $settings->issuer->imun)
+                    ->set('Senha', $settings->issuer->imun)
+                    ->set('FraseSecreta', $settings->issuer->imun)
+                    ->save();
+                break;
+
             case 'cancelamentoNFs':
                 $this->xml = XML::load($parameters->file)
                     ->set('Id', $parameters->id)
@@ -55,7 +64,19 @@ class ConsultBase
                     ->filter()
                     ->save();
                 break;
-
+            case 'cancelamentoNFsQuasar':
+                $this->xml = XML::load($parameters->file)
+                    ->set('Id', $parameters->id)
+                    ->set('numeroNFSe', $this->num->with($parameters->numerNFse)->sanitize()->get())
+                    ->set('cnpjPrestador', $settings->issuer->cnpj)
+                    ->set('imPrestador', $settings->issuer->imun)
+                    ->set('codigoMunicipioPrestaor', $settings->issuer->codMun)
+                    ->set('codigoCancelamento', $parameters->cancellationCode)
+                    ->filter()
+                    ->save();
+                break;
+            case 'consultarNfseRpsEnvio':
+                break;
             default:
                 throw new Exception("Falha ao carregar arquivo XML");
 

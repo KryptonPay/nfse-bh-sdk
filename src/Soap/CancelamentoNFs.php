@@ -25,11 +25,11 @@ class CancelamentoNFs
     //retorna os dados de confirmação do cancelamento
     public function getDataCancelamento()
     {
-        if (is_object($this->wsResponse) && isset($this->wsResponse->outputXML)) {
+        if ((is_object($this->wsResponse) && isset($this->wsResponse->outputXML)) || (is_object($this->wsResponse) && isset($this->wsResponse->return))) {
 
             //carrega o xml da consulta
-            $this->dataCancelamento['xmlCancelamento'] = $this->wsResponse->outputXML;
-            $this->wsResponse = simplexml_load_string($this->wsResponse->outputXML);
+            $this->dataCancelamento['xmlCancelamento'] = isset($this->wsResponse->outputXML) ? $this->wsResponse->outputXML : $this->wsResponse->return;
+            $this->wsResponse =  isset($this->wsResponse->outputXML) ? simplexml_load_string($this->wsResponse->outputXML) : simplexml_load_string($this->wsResponse->return);
             $retornoCancelamento = $this->wsResponse->RetCancelamento->NfseCancelamento;
 
             //verifica se há mais de uma nota no lote
@@ -48,7 +48,7 @@ class CancelamentoNFs
 
             //retorna o array montado
             return $this->dataCancelamento;
-        } else {
+        }else {
             $this->error = "Não foi possivel processar a resposta do servidor da prefeitura.";
             return false;
         }

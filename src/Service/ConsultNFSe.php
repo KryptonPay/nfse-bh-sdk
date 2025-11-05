@@ -14,6 +14,7 @@ use NFse\Soap\Soap;
 class ConsultNFSe extends ConsultBase
 {
     private $xSoap;
+    private $settings;
 
     const CNPJ = 1;
     const CPF = 2;
@@ -25,11 +26,12 @@ class ConsultNFSe extends ConsultBase
      */
     public function __construct(Settings $settings)
     {
-        $this->xSoap = new Soap($settings, 'ConsultarNfseRequest');
+        $this->settings = $settings;
+        $this->xSoap = new Soap($settings, ($settings->issuer->codMun != 3147105 ? 'ConsultarNfseRequest' : 'ConsultarNfseServicoPrestado'));
         $this->num = new Num;
 
         parent::__construct();
-        $this->syncModel = $this->callConsultation($settings, (object) [ 'file' => 'consultaNFs']);
+        $this->syncModel = $this->callConsultation($settings, (object) [ 'file' => ($settings->issuer->codMun != 3147105 ? 'consultaNFs' : 'consultaQuasarNFs')]);
     }
 
     /**
@@ -39,11 +41,18 @@ class ConsultNFSe extends ConsultBase
      */
     public function sendConsultation(MdlConsultNFse $consultNFse): object
     {
+
         //monta o xml de pesquisa
         try {
             $this->setSearch($consultNFse);
         } catch (Exception $ex) {
             throw new Exception($ex->getMessage());
+        }
+
+        if($this->settings->issuer->codMun == 3147105){
+            //remove sujeiras do xml
+            $order = ["\r\n", "\n", "\r", "\t"];
+            $this->xml = str_replace($order, '', htmlspecialchars($this->xml, ENT_QUOTES | ENT_XML1));
         }
 
         //envia a chamada para o SOAP
@@ -55,7 +64,8 @@ class ConsultNFSe extends ConsultBase
         }
 
         //carrega o xml de resposta para um object
-        $xmlResponse = simplexml_load_string($wsResponse->outputXML);
+        $xmlResponse = simplexml_load_string($wsResponse->outputXML ?? $wsResponse->return);
+
         //identifica o retorno e faz o processamento nescessário
         if (is_object($xmlResponse) && isset($xmlResponse->ListaMensagemRetorno)) {
             $wsError = new ErrorMsg($xmlResponse);
@@ -109,6 +119,7 @@ class ConsultNFSe extends ConsultBase
             ->set('dataInicial', $initDate)
             ->set('dataFinal', $endDate)
             ->set('docTomador', $tagTaker)
+            ->set('Pagina', 1)
             ->save();
     }
 }

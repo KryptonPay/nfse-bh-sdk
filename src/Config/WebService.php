@@ -19,6 +19,18 @@ class WebService
     public $sslVerifyPeer = false;
     public $sslVerifyPeerName = false;
 
+    public $urlHomolagation = [
+        3106200 => 'https://bhisshomologa.pbh.gov.br/bhiss-ws/nfse?wsdl',
+        3543402 => 'https://nfse.issnetonline.com.br/abrasf204/ribeiraopreto/nfse.asmx?wsdl',
+        3147105 => 'https://parademinas.mg.issqn.quasar.srv.br/nfe/snissdigitalsvc?wsdl'
+    ];
+
+    public $urlProduction = [
+        3106200 => 'https://bhissdigitalws.pbh.gov.br/bhiss-ws/nfse?wsdl',
+        3543402 => 'https://nfse.issnetonline.com.br/abrasf204/ribeiraopreto/nfse.asmx?wsdl',
+        3147105 => 'https://parademinas.mg.issqn.quasar.srv.br/nfe/snissdigitalsvc?wsdl'
+    ];
+
     /**
      * construtor
      *
@@ -28,10 +40,11 @@ class WebService
     {
         try {
             $this->env = $settings->environment;
+         
             if ($this->env == 'homologacao') {
-                $this->homologacao();
+                $this->homologacao($settings->issuer->codMun);
             } else {
-                $this->producao();
+                $this->producao($settings->issuer->codMun);
             }
         } catch (Exception $e) {
             throw $e;
@@ -41,18 +54,19 @@ class WebService
     /**
      * configuração para o ambiente de homologacao
      */
-    private function homologacao(): void
+    private function homologacao($codMun): void
     {
-        $this->wsdl = 'https://bhisshomologa.pbh.gov.br/bhiss-ws/nfse?wsdl';
+        $this->wsdl = $this->urlHomolagation[$codMun];
+
         $this->folder = 'homologacao';
     }
 
     /**
      * configuração para o ambiente de produção
      */
-    private function producao(): void
+    private function producao($codMun): void
     {
-        $this->wsdl = 'https://bhissdigital.pbh.gov.br/bhiss-ws/nfse?wsdl';
+        $this->wsdl = $this->urlProduction[$codMun];
         $this->folder = 'producao';
     }
 }

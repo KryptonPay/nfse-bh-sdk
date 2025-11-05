@@ -24,4 +24,22 @@ class ConsultNFse
      *
      */
     public $document;
+
+    /**
+     *@var string documento do tomador
+     *
+     */
+    public $secret_phrase;
+
+    /**
+     *@var string documento do tomador
+     *
+     */
+    public $password;
+
+    /**
+     *@var string documento do tomador
+     *
+     */
+    public $subscriber_provider;
 }

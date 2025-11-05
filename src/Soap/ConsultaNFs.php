@@ -7,18 +7,18 @@ class ConsultaNFs extends ConsultaLoteRps
     private $NFs;
 
     //construtor (passar o SOAP response)
-    public function __construct($wsResponse)
+    public function construct($wsResponse)
     {
-        return parent::__construct($wsResponse);
+        return parent::construct($wsResponse);
     }
 
     //retorna os dados de entrada do lote após o envio
     public function getDadosNFs()
     {
-        if (is_object($this->wsResponse) && isset($this->wsResponse->outputXML)) {
-
+        if (is_object($this->wsResponse) && isset($this->wsResponse->outputXML) || is_object($this->wsResponse) && isset($this->wsResponse->return)) {
             //carrega o xml da consulta
-            $this->wsResponse = simplexml_load_string($this->wsResponse->outputXML);
+            $bhIss = isset($this->wsResponse->outputXML);
+            $this->wsResponse = isset($this->wsResponse->outputXML) ? simplexml_load_string($this->wsResponse->outputXML) : simplexml_load_string( $this->wsResponse->return);
             $nfsList = $this->wsResponse->ListaNfse->CompNfse;
 
             //verifica se há mais de uma nota no lote
@@ -26,8 +26,9 @@ class ConsultaNFs extends ConsultaLoteRps
                 foreach ($nfsList as $NFS) {
                     //adiciona a nota ao array
                     $this->domDocument->loadXML($NFS->asXML());
-                    $this->dataLote['nfs'][$NFS->Nfse->InfNfse->Numero->__toString()] = $this->getInfSearchNFSe($NFS->Nfse->InfNfse);
+                    $this->dataLote['nfs'][$NFS->Nfse->InfNfse->Numero->__toString()] = $bhIss ? $this->getInfSearchNFSe($NFS->Nfse->InfNfse) : $this->getInfSearchNFSeQuasar($NFS->Nfse->InfNfse);
                     $this->dataLote['xml'][$NFS->Nfse->InfNfse->Numero->__toString()] = $this->domDocument->saveXML();
+                    $this->dataLote['nfseOthers'][$NFS->Nfse->InfNfse->Numero->__toString()] = $this->getInfSearchNFSeOthers($NFS);
                 }
             } else {
                 $this->dataLote['nfs'] = null;

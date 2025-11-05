@@ -156,6 +156,8 @@ class ConsultaLoteRps
             'incentivadorCultural' => isset($InfNfse->IncentivadorCultural) ? $InfNfse->IncentivadorCultural->__toString() : null,
             'competencia' => isset($InfNfse->Competencia) ? $InfNfse->Competencia->__toString() : null,
             'outrasInformacoes' => isset($InfNfse->OutrasInformacoes) ? $InfNfse->OutrasInformacoes->__toString() : null,
+            'nfseSubstituida' => isset($InfNfse->NfseSubstituida) ? $InfNfse->NfseSubstituida : null,
+            'identificacaoRps' => isset($InfNfse->IdentificacaoRps->Numero) ? $InfNfse->IdentificacaoRps->Numero->__toString() : null,
 
             'servico' => [
                 'valores' => [
@@ -219,6 +221,15 @@ class ConsultaLoteRps
         ];
     }
 
+    public function getInfSearchNFSeOthers($InfNfse)
+    {
+        return [
+            'nfseSubstituidora' => isset($InfNfse->NfseSubstituicao->SubstituicaoNfse->NfseSubstituidora) ? $InfNfse->NfseSubstituicao->SubstituicaoNfse->NfseSubstituidora->__toString() : null,
+            'codCancelamento' => isset($InfNfse->NfseCancelamento->Confirmacao->Pedido->InfPedidoCancelamento->CodigoCancelamento) ? $InfNfse->NfseCancelamento->Confirmacao->Pedido->InfPedidoCancelamento->CodigoCancelamento->__toString() : null,
+            'dataCancelamento' => isset($InfNfse->NfseCancelamento->Confirmacao->DataHora) ? str_replace("T"," ",$InfNfse->NfseCancelamento->Confirmacao->DataHora) : null
+        ];
+    }
+
     //retorna a lista de erros de processamento no caso dos lotes rejeitados
     public function getErrosLote()
     {
@@ -243,5 +254,84 @@ class ConsultaLoteRps
             $this->error = "Não foi possivel processar a resposta do servidor da prefeitura.";
             return false;
         }
+    }
+
+
+    //retorna os dados de uma pesquisa de notas
+    public function getInfSearchNFSeQuasar($InfNfse)
+    {
+        return [
+            'numero' => $InfNfse->Numero->__toString(),
+            'codigoVerificacao' => $InfNfse->CodigoVerificacao->__toString(),
+            'dataEmissao' => $InfNfse->DataEmissao->__toString(),
+            'naturezaOperacao' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->ExigibilidadeISS) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->ExigibilidadeISS->__toString() : null,
+            'regimeEspecialTributacao' => isset($InfNfse->RegimeEspecialTributacao) ? $InfNfse->RegimeEspecialTributacao->__toString() : null,
+            'optanteSimplesNacional' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->OptanteSimplesNacional) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->OptanteSimplesNacional->__toString() : null,
+            'incentivadorCultural' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->IncentivoFiscal) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->IncentivoFiscal->__toString() : null,
+            'competencia' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Competencia) ? str_replace('-03:00', " 00:00:00.000", $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Competencia->__toString()) : null,
+            'outrasInformacoes' => isset($InfNfse->OutrasInformacoes) ? $InfNfse->OutrasInformacoes->__toString() : null,
+            'nfseSubstituida' => isset($InfNfse->NfseSubstituida) ? $InfNfse->NfseSubstituida : null,
+            'identificacaoRps' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Rps->IdentificacaoRps->Numero) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Rps->IdentificacaoRps->Numero->__toString() : null,
+
+            'servico' => [
+                'valores' => [
+                    'valorServicos' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorServicos)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorServicos->__toString() : 0,
+                    'valorDeducoes' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorDeducoes)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorDeducoes->__toString() : 0,
+                    'valorPis' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorPis)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorPis->__toString() : 0,
+                    'valorCofins' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorCofins)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorCofins->__toString() : 0,
+                    'valorInss' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorInss)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorInss->__toString() : 0,
+                    'valorIr' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorIr)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorIr->__toString() : 0,
+                    'valorCsll' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorCsll)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorCsll->__toString() : 0,
+                    'issRetido' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->IssRetido)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->IssRetido->__toString() : 0,
+                    'valorIss' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorIss)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorIss->__toString() : 0,
+                    'valorIssRetido' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorIssRetido)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->ValorIssRetido->__toString() : 0,
+                    'outrasRetencoes' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->OutrasRetencoes)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->OutrasRetencoes->__toString() : 0,
+                    'baseCalculo' => (isset($InfNfse->ValoresNfse->BaseCalculo)) ? $InfNfse->ValoresNfse->BaseCalculo->__toString() : 0,
+                    'aliquota' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->Aliquota)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->Aliquota->__toString() : 0,
+                    'valorLiquidoNfse' => (isset($InfNfse->ValoresNfse->BaseCalculo->ValorLiquidoNfse)) ? $InfNfse->ValoresNfse->BaseCalculo->ValorLiquidoNfse->__toString() : 0,
+                    'descontoIncondicionado' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->DescontoIncondicionado)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->DescontoIncondicionado->__toString() : 0,
+                    'descontoCondicionado' => (isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->DescontoCondicionado)) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Valores->DescontoCondicionado->__toString() : 0,
+                ],
+
+                'itemListaServico' => $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->ItemListaServico->__toString(),
+                'codigoTributacaoMunicipio' => $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->CodigoTributacaoMunicipio->__toString(),
+                'discriminacao' => $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->Discriminacao->__toString(),
+                'codigoMunicipio' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->CodigoMunicipio) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Servico->CodigoMunicipio->__toString() : null,
+            ],
+
+            'prestadorServico' => [
+                'cpfCnpj' => isset($InfNfse->PrestadorServico->IdentificacaoPrestador->CpfCnpj->Cnpj) ? $InfNfse->PrestadorServico->IdentificacaoPrestador->CpfCnpj->Cnpj->__toString() : $InfNfse->PrestadorServico->IdentificacaoPrestador->Cpf->__toString(),
+                'inscricaoMunicipal' => isset($InfNfse->PrestadorServico->IdentificacaoPrestador->InscricaoMunicipal) ? $InfNfse->PrestadorServico->IdentificacaoPrestador->InscricaoMunicipal->__toString() : null,
+                'razaoSocial' => $InfNfse->PrestadorServico->RazaoSocial->__toString(),
+                'nomeFantasia' => $InfNfse->PrestadorServico->NomeFantasia->__toString(),
+                'endereco' => $InfNfse->PrestadorServico->Endereco->Endereco->__toString(),
+                'numero' => $InfNfse->PrestadorServico->Endereco->Numero->__toString(),
+                'complemento' => isset($InfNfse->PrestadorServico->Endereco->Complemento) ? $InfNfse->PrestadorServico->Endereco->Complemento->__toString() : null,
+                'bairro' => $InfNfse->PrestadorServico->Endereco->Bairro->__toString(),
+                'codigoMunicipio' => $InfNfse->PrestadorServico->Endereco->CodigoMunicipio->__toString(),
+                'uf' => $InfNfse->PrestadorServico->Endereco->Uf->__toString(),
+                'cep' => $InfNfse->PrestadorServico->Endereco->Cep->__toString(),
+                'telefone' => isset($InfNfse->PrestadorServico->Contato->Telefone) ? $InfNfse->PrestadorServico->Contato->Telefone->__toString() : null,
+                'email' => isset($InfNfse->PrestadorServico->Contato->Email) ? $InfNfse->PrestadorServico->Contato->Email->__toString() : null,
+            ],
+
+            'tomadorServico' => [
+                'cpfCnpj' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->IdentificacaoTomador->CpfCnpj->Cnpj) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->IdentificacaoTomador->CpfCnpj->Cnpj->__toString() : $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->IdentificacaoTomador->CpfCnpj->Cpf->__toString(),
+                'inscricaoMunicipal' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->IdentificacaoTomador->InscricaoMunicipal) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->IdentificacaoTomador->InscricaoMunicipal->__toString() : null,
+                'razaoSocial' => $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->RazaoSocial->__toString(),
+                'endereco' => $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->Endereco->__toString(),
+                'numero' => $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->Numero->__toString(),
+                'complemento' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->Complemento) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->Complemento->__toString() : null,
+                'bairro' => $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->Bairro->__toString(),
+                'cep' => $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->Cep->__toString(),
+                'codigoMunicipio' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->CodigoMunicipio) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->CodigoMunicipio->__toString() : null,
+                'uf' => isset($InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->Uf) ? $InfNfse->DeclaracaoPrestacaoServico->InfDeclaracaoPrestacaoServico->Tomador->Endereco->Uf->__toString() : null,
+            ],
+
+            'orgaoGerador' => isset($InfNfse->OrgaoGerador) ? [
+                'codigoMunicipio' => isset($InfNfse->OrgaoGerador->CodigoMunicipio) ? $InfNfse->OrgaoGerador->CodigoMunicipio->__toString() : null,
+                'uf' => isset($InfNfse->OrgaoGerador->Uf) ? $InfNfse->OrgaoGerador->Uf->__toString() : null,
+            ] : null,
+        ];
     }
 }

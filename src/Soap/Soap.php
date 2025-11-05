@@ -26,7 +26,6 @@ class Soap extends SoapClient
             $this->webservice = new WebService($settings);
             $this->method = $method;
             $this->settings = $settings;
-
             //seta as opções de certificado digital e stream context
             if (is_null($options)) {
                 $options = [
@@ -48,14 +47,13 @@ class Soap extends SoapClient
                     ]),
                 ];
             }
-
             try {
-                $parent = parent::__construct($this->webservice->wsdl, $options);
+
+                parent::__construct($this->webservice->wsdl, $options);
+
             } catch (SoapFault $e) {
                 throw new Exception("No momento o sistema da prefeitura está instável ou inoperante, tente novamente mais tarde.\nE - {$e->getMessage()}");
             }
-
-            return $parent;
         } catch (Exception $e) {
             throw $e;
         }
@@ -76,6 +74,7 @@ class Soap extends SoapClient
     {
         $remove = ['xmlns:default="http://www.w3.org/2000/09/xmldsig#"', ' standalone="no"', 'default:', ':default', "\n", "\r", "\t", "  "];
         $encode = ['<?xml version="1.0"?>', '<?xml version="1.0" encoding="utf-8"?>', '<?xml version="1.0" encoding="UTF-8"?>', '<?xml version="1.0" encoding="utf-8" standalone="no"?>', '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'];
+
         $this->xml = str_replace(array_merge($remove, $encode), '', $this->xml);
     }
 
@@ -93,19 +92,35 @@ class Soap extends SoapClient
         $this->clearXml();
 
         //monta a mensagem ao webservice
-        $data = '<?xml version="1.0" encoding="utf-8"?>';
-        $data .= '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">';
-        $data .= '<S:Body>';
-        $data .= '<ns2:' . $this->method . ' xmlns:ns2="http://ws.bhiss.pbh.gov.br">';
-        $data .= '<nfseCabecMsg>';
-        $data .= '<![CDATA[<cabecalho xmlns="http://www.abrasf.org.br/nfse.xsd" versao="1.00"><versaoDados>1.00</versaoDados></cabecalho>]]>';
-        $data .= '</nfseCabecMsg>';
-        $data .= '<nfseDadosMsg>';
-        $data .= '<![CDATA[' . $this->xml . ']]>';
-        $data .= '</nfseDadosMsg>';
-        $data .= '</ns2:' . $this->method . '>';
-        $data .= '</S:Body>';
-        $data .= '</S:Envelope>';
+        if($this->settings->issuer->codMun == '3147105')
+        {
+            $data = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.supernova.com.br/">';
+            $data .= '<soapenv:Header/>';
+            $data .= '<soapenv:Body>';
+            $data .= "<ws:{$this->method}>";
+            $location = 'https://parademinas.quasar.srv.br/nfe/snissdigitalsvc?wsdl';
+            $data .= '<xml>';
+            $data .= $this->xml;
+            $data .= '</xml>';
+            $data .= "</ws:{$this->method}>";
+            $data .= '</soapenv:Body>';
+            $data .= '</soapenv:Envelope>';
+        } else
+        {
+            $data = '<?xml version="1.0" encoding="utf-8"?>';
+            $data .= '<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">';
+            $data .= '<S:Body>';
+            $data .= '<ns2:' . $this->method . ' xmlns:ns2="http://ws.bhiss.pbh.gov.br">';
+            $data .= '<nfseCabecMsg>';
+            $data .= '<![CDATA[<cabecalho xmlns="http://www.abrasf.org.br/nfse.xsd" versao="1.00"><versaoDados>1.00</versaoDados></cabecalho>]]>';
+            $data .= '</nfseCabecMsg>';
+            $data .= '<nfseDadosMsg>';
+            $data .= '<![CDATA[' . $this->xml . ']]>';
+            $data .= '</nfseDadosMsg>';
+            $data .= '</ns2:' . $this->method . '>';
+            $data .= '</S:Body>';
+            $data .= '</S:Envelope>';
+        }
 
         try {
             $response = parent::__doRequest($data, $location, $action, $version, $one_way);

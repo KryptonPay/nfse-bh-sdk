@@ -12,16 +12,22 @@ class PrintPDFNFse
     private $html;
     private $nfse;
     private $logo64;
+    private $logoPrefeitura;
+    private $textPrefeitura;
+    private $logoNota10;
 
     /**
-     *recebe o objeto da nota fiscal para impressão.
+     * recebe o objeto da nota fiscal para impressão.
      *
      * @param NFse\Models\NFse;
      */
-    public function __construct(NFse $nfse, string $logo64)
+    public function __construct(NFse $nfse, string $logo64, string $logoPrefeitura, $textPrefeitura, $logoNota10)
     {
         $this->nfse = $nfse;
         $this->logo64 = $logo64;
+        $this->logoPrefeitura = $logoPrefeitura;
+        $this->textPrefeitura = $textPrefeitura;
+        $this->logoNota10 = $logoNota10;
     }
 
     //gera e retorna o pdf da nota
@@ -82,7 +88,7 @@ class PrintPDFNFse
                     text-align: center;
                 }
                 .logo {
-                    max-width: 230px;
+                    max-width:530px;
                     padding: 10px;
                 }
                 .teste {
@@ -209,6 +215,29 @@ class PrintPDFNFse
             }';
         }
 
+        if ($this->nfse->cancellationCode) {
+            $printCss .= '
+                #container:before{
+                  content: \'NFS-e Cancelada\';
+                  position: absolute;
+                  top: 0;
+                  bottom: 0;
+                  left: 0;
+                  right: 0;
+                  z-index: 1;
+                  color: black;
+                  font-size: 100px;
+                  font-weight: 500px;
+                  display: grid;
+                  justify-content: center;
+                  align-content: center;
+                  opacity: 0.2;
+                  transform: rotate(-45deg);
+                  white-space: nowrap;
+                }
+            ';
+        }
+
         $nfseNumberReplaced = '';
 
         if (!empty($this->nfse->nfseNumberReplaced)) {
@@ -273,6 +302,10 @@ class PrintPDFNFse
                     </td>
                 </tr>
             </span>';
+        }
+
+		if($this->nfse->provider->address->city_code == 3550308){
+            $this->html = preg_replace('/<div\s+class="box04"\s+id="taxation_code">(.*?)<\/div>/s', '', $this->html);
         }
 
         $this->html = str_replace(
@@ -340,6 +373,9 @@ class PrintPDFNFse
                 '{VALOR_INSS}',
                 //footer
                 '{OPITANTE_PELO_SIMPLES}',
+                '{PREFEITURA_LOGO_BASE_64}',
+                '{TEXT_PREFEITURA}',
+                '{LOGO_NOTA_10}',
             ],
             [
                 //css
@@ -386,14 +422,14 @@ class PrintPDFNFse
 
                 //body
                 $this->nfse->service->description,
-                Utils::mask((string) $this->nfse->service->municipalityTaxationCode, '####-#/##-##'),
+                (\strlen($this->nfse->service->municipalityTaxationCode) > 7) ? Utils::mask((string) $this->nfse->service->municipalityTaxationCode, '####-#/##-##') : Utils::mask((string) $this->nfse->service->municipalityTaxationCode, '#####.##'),
                 strtolower($this->nfse->service->taxCodeDescription),
                 //item
                 $this->nfse->service->itemList,
                 strtolower($this->nfse->service->itemDescription),
 
                 $this->nfse->service->municipalCode,
-                strtolower($this->nfse->service->municipalName),
+                $this->nfse->service->municipalName,
 
                 $operations[$this->nfse->service->nature],
                 $specialTaxRegime,
@@ -415,6 +451,9 @@ class PrintPDFNFse
                 Utils::formatRealMoney($this->nfse->service->valueCSLL ?? 0),
                 Utils::formatRealMoney($this->nfse->service->valueINSS ?? 0),
                 $optanteSimplesNacional,
+                $this->logoPrefeitura,
+                $this->textPrefeitura,
+                $this->logoNota10,
             ],
             $this->html
         );

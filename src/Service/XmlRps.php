@@ -26,13 +26,26 @@ class XmlRps
         //inicializa os validators
         $this->num = new Num;
         $this->text = new Text;
+        switch ($settings->issuer->codMun){
+            case 3106200;
+                $methood = 'loteRps';
+                break;
+            case 3106200;
+                $methood = 'nfseEnvio';
+                break;
+            case 3147105;
+                $methood = 'nfseEnvioQuasar';
+                break;
+        }
 
         //cria o documento XML
-        $this->xml = XML::load('loteRps')
+        $this->xml = XML::load($methood)
             ->set('NumeroLote', $this->text->with($numLote)->sanitize()->get())
             ->set('Cnpj', $this->num->with($this->settings->issuer->cnpj)->sanitize()->get())
-            ->set('InscricaoMunicipal', $this->num->with($this->settings->issuer->imun)->sanitize()->get())
+            ->set('InscricaoMunicipal', $this->num->with($this->settings->issuer->imun)->get())
             ->filter()->save();
+
+
     }
 
     /**
@@ -53,9 +66,9 @@ class XmlRps
     public function getLoteRps(): string
     {
         $xml = XML::load($this->xml, true)
-            ->set('QuantidadeRps', $this->countRps)
-            ->set('Rps', $this->signedRps)
-            ->filter()->save();
+        ->set('QuantidadeRps', $this->countRps)
+        ->set('Rps', $this->signedRps)
+        ->filter()->save();
 
         return $xml;
     }
