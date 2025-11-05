@@ -1,14 +1,14 @@
 {
-    "name": "kryptonpay/nfse-bh-sdk",
+    "name": "kryptontech/nfse-bh-sdk",
     "type": "library",
     "description": "Biblioteca para geração de NFSE de Belo Horizonte",
-    "homepage": "https://www.linkedin.com/in/wander-alves-935b6314b",
+    "homepage": "https://kryptontech.com.br",
     "keywords": ["nfse", "lib", "nfsebh"],
     "license": "MIT",
     "authors": [
         {
-            "name": "Wander Alves",
-            "email": "wsilva_94@outlook.com"
+            "name": "Victor Sousa",
+            "email": "svictor@kryptontech.com.br"
         }
     ],
     "minimum-stability": "stable",
